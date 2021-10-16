@@ -82,11 +82,11 @@ console.error(err)
 function video(title , link , key , date , share, size){
     var link2 = link.replace('https://drive.google.com/uc?export=download&id=', "")
     const id = link2.replace(/\s/g, '')
-    link2 = `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=AIzaSyAHIDPKFSVbDwk-NdlAW8n3uh2q6AJkyAA`;
+    link2 = `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=AIzaSyCpdoMyef5cgIQ5EmcoPJLgsvkXl3uytqo`;
     var html;
     try{ html = `
     <div class="card mr-4 ${key}" size="${size}" date="${date}" share=${share} style="width: 28%; height: 14rem" id="${key}" title="${title}" key="${key}" link="${btoa(link)}" onclick="dropDown(this)" >
-    <video class="card-img-top" poster="https://drive.google.com/thumbnail?id=${id}" src="${btoa(link)}" controls></video>
+    <video class="card-img-top" poster="https://drive.google.com/thumbnail?id=${id}" src="${link2}" controls></video>
     <div class="card-body">
     <h5 class="card-title mb-0 file" data-id="${key}"><i class="fas fa-image mr-4"></i>${title}</h5>                           
     </div>
