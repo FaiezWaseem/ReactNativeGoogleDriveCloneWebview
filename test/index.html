@@ -167,7 +167,7 @@ button.onclick = ()=>{
               console.log(res.result.id);
             console.log(res.result.name);
             setTimeout(function () {
-            window.ReactNativeWebView.postMessage(res.result)
+            window.ReactNativeWebView.postMessage(`id : ${res.result.id} FileName :${res.result.name}  rawData : ${JSON.stringify(res.result.name)} `)
           }, 2000)
             }catch(err){
       console.log(res)
