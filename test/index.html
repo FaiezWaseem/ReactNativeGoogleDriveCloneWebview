@@ -1,0 +1,192 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload | Video Point</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #5256ad;
+}
+.drag-area{
+  border: 2px dashed #fff;
+  height: 500px;
+  width: 700px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.drag-area.active{
+  border: 2px solid #fff;
+}
+.drag-area .icon{
+  font-size: 100px;
+  color: #fff;
+}
+.drag-area header{
+  font-size: 30px;
+  font-weight: 500;
+  color: #fff;
+}
+.drag-area span{
+  font-size: 25px;
+  font-weight: 500;
+  color: #fff;
+  margin: 10px 0 15px 0;
+}
+.drag-area button{
+  padding: 10px 25px;
+  font-size: 20px;
+  font-weight: 500;
+  border: none;
+  outline: none;
+  background: #fff;
+  color: #5256ad;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.drag-area img{
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+@media screen and (max-width : 468px) {
+  .drag-area{
+    width: 280px !important;
+    height: 400px !important; 
+  }
+  .drag-area header{
+    font-size: 1.4rem !important;
+  }
+}
+@media screen and (max-width : 568px) {
+  .drag-area{
+    width: 380px;
+    height: 450px;
+  }
+  .drag-area header{
+    font-size: 1.7rem;
+  }
+}
+    </style>
+</head>
+<body>
+    <form id="form">
+        <div class="drag-area">
+            <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <header id="progress">CLick to Upload File</header>
+            <button>Browse File</button>
+                <input name="file" id="uploadfile" type="file" hidden/>
+        </div>
+    </form>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/tanaikech/ResumableUploadForGoogleDrive_js@master/resumableupload_js.min.js"></script>
+    
+
+    <script>
+       const dropArea = document.querySelector(".drag-area"),
+        button = dropArea.querySelector("button"),
+input = dropArea.querySelector("input");
+form.addEventListener('submit', e => {
+    e.preventDefault();
+});
+button.onclick = ()=>{
+  input.click(); //if user click on the button then the input also clicked
+}
+        var drive_accessToken ;
+      function getAccessToken(){
+          const id = 'AKfycbz19inbya5CcwM48qEXSQk4VssWSQNCcvcrmUBIk6QVgGsUoOBi2t9Cjn7Cy_6UnrW9'
+          const url = `https://script.google.com/macros/s/${id}/exec`; 
+          const qs = new URLSearchParams({filename: 'xx', mimeType: 'xxx'});
+          fetch(`${url}?${qs}`, {
+       method: "POST",
+        body: '' })
+          .then(res => res.json())
+          .then(e => {
+            drive_accessToken = e.token;
+            console.log(e)
+          })
+          .catch(err =>{
+              console.error("Failed To get AccessToken ReTrying \n",[err])
+              getAccessToken()
+          
+          })
+      }
+      
+      getAccessToken();
+        // Please set access token here.
+        const accessToken = drive_accessToken;
+      console.group();
+       input.addEventListener("change", run, false);
+      
+        function run(obj) {
+          console.log(obj.target.files[0])
+          console.log(obj)
+          const file = obj.target.files[0];
+          if (file.name != "") {
+            let fr = new FileReader();
+            fr.fileName = file.name;
+            fr.fileSize = file.size;
+            fr.fileType = file.type;
+            fr.readAsArrayBuffer(file);
+            fr.onload = resumableUpload;
+          }
+        }
+      
+        function resumableUpload(e) {
+          document.getElementById("progress").innerHTML = "Initializing.";
+          const f = e.target;
+          const resource = {
+            fileName: f.fileName,
+            fileSize: f.fileSize,
+            fileType: f.fileType,
+            fileBuffer: f.result,
+            accessToken: drive_accessToken
+          };
+          const ru = new ResumableUploadToGoogleDrive();
+          ru.Do(resource, function(res, err) {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            try{
+              console.log(res.result.id);
+            console.log(res.result.name);
+            setTimeout(function () {
+            window.ReactNativeWebView.postMessage(res.result)
+          }, 2000)
+            }catch(err){
+      console.log(res)
+            }
+            let msg = "";
+            if (res.status == "Uploading") {
+              msg =
+                Math.round(
+                  (res.progressNumber.current / res.progressNumber.end) * 100
+                ) + "%";
+            } else {
+              msg = res.status;
+            }
+            document.getElementById("progress").innerText = msg;
+          });
+        }
+      </script>
+
+  <!-- <script src="./main.js"></script> -->
+
+</body>
+</html>
